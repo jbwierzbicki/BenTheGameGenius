@@ -34,14 +34,18 @@ const ApiConfigurationPanel = ({
   });
   const [documentationUrl, setDocumentationUrl] = React.useState("");
   const [testEndpoint, setTestEndpoint] = React.useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
     try {
+      setIsSaving(true);
       const encryptedKey = await encrypt(apiKey, import.meta.env.VITE_ENCRYPTION_KEY);
       await secureStorage.setItem("apiKey", encryptedKey);
       onSave({ apiKey, documentationUrl, testEndpoint });
     } catch (error) {
       console.error('Failed to save API key:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -126,8 +130,9 @@ const ApiConfigurationPanel = ({
               <Button
                 onClick={handleSave}
                 className="w-24"
+                disabled={isSaving}
               >
-                Save
+                {isSaving ? "Saving..." : "Save"}
               </Button>
             </div>
           </div>

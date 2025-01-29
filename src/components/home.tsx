@@ -15,25 +15,32 @@ const Home = () => {
   const [error, setError] = useState<string | null>(null);
   const [generatedGame, setGeneratedGame] = useState(null);
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (formData?: any) => {
     const controller = new AbortController();
+    const apiKey = await secureStorage.getItem("apiKey");
     
     try {
       setIsGenerating(true);
       setError(null);
 
-      const response = await fetch(API_ENDPOINT, {
+      const response = await fetch(import.meta.env.VITE_API_ENDPOINT, {
         signal: controller.signal,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`
         },
-        body: JSON.stringify({ description: gameDescription })
+        body: JSON.stringify({
+          ...(formData || { description: gameDescription }),
+          testEndpoint: "/api/v1/test"
+        })
       });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to generate game');
+      }
+
       const data = await response.json();
       setGeneratedGame(data);
 
@@ -108,6 +115,7 @@ const Home = () => {
               onExportClick={() => {
                 console.log("Exporting game");
               }}
+              error={error}
             />
           </div>
         </div>

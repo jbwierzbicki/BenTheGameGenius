@@ -24,6 +24,7 @@ interface FormState {
   gameType: string;
   complexity: string;
   requirements: string;
+  theme: string;
 }
 
 const SurveyForm = ({
@@ -35,7 +36,8 @@ const SurveyForm = ({
     duration: "medium",
     gameType: "strategy",
     complexity: "medium",
-    requirements: ""
+    requirements: "",
+    theme: ""
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -177,10 +179,15 @@ const SurveyForm = ({
               value={formData.theme}
               onChange={(e) => setFormData(p => ({...p, theme: e.target.value}))}
             />
+            {errors.theme && <p className="text-red-500 text-sm">{errors.theme}</p>}
           </div>
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button 
+          type="submit" 
+          className="w-full" 
+          disabled={isLoading || Object.keys(errors).length > 0}
+        >
           {isLoading ? "Generating Game..." : "Generate Game"}
         </Button>
       </form>

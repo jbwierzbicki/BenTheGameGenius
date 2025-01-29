@@ -12,6 +12,7 @@ interface GeneratedGameDisplayProps {
   scoring?: string;
   onRegenerateClick?: () => void;
   onExportClick?: () => void;
+  error?: string;
 }
 
 const GeneratedGameDisplay = ({
@@ -21,9 +22,15 @@ const GeneratedGameDisplay = ({
   scoring = "Players earn points for:\n- Collecting resource cards: 2 points each\n- Avoiding hazards: 1 point each\n- Reaching checkpoints: 5 points\n- First to destination: 10 bonus points",
   onRegenerateClick = () => console.log("Regenerate clicked"),
   onExportClick = () => console.log("Export clicked"),
+  error,
 }: GeneratedGameDisplayProps) => {
   return (
     <Card className="w-full h-full max-w-[800px] mx-auto bg-gray-50 p-6">
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md">
+          Error: {error}
+        </div>
+      )}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">{gameTitle}</h2>
         <div className="space-x-4">
