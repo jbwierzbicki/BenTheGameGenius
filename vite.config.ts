@@ -26,6 +26,7 @@ export default defineConfig({
     preserveSymlinks: true,
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      'crypto-js': path.resolve(__dirname, 'node_modules/crypto-js'),
     },
   },
 });
