@@ -30,13 +30,13 @@ const ApiConfigurationPanel = ({
   const [isExpanded, setIsExpanded] = React.useState(isOpen);
   const [apiKey, setApiKey] = React.useState(() => {
     const storedKey = secureStorage.getItem("apiKey");
-    return storedKey ? decrypt(storedKey, process.env.ENCRYPTION_KEY) : "";
+    return storedKey ? decrypt(storedKey, import.meta.env.VITE_ENCRYPTION_KEY) : "";
   });
   const [documentationUrl, setDocumentationUrl] = React.useState("");
   const [testEndpoint, setTestEndpoint] = React.useState("");
 
   const handleSave = () => {
-    const encryptedKey = encrypt(apiKey, process.env.ENCRYPTION_KEY);
+    const encryptedKey = encrypt(apiKey, import.meta.env.VITE_ENCRYPTION_KEY);
     secureStorage.setItem("apiKey", encryptedKey);
     onSave({ apiKey, documentationUrl, testEndpoint });
   };
