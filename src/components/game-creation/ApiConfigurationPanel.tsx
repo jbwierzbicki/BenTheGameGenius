@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp, Key, Link, TestTube2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { secureStorage } from "@/lib/security";
+import { secureStorage, encrypt } from "@/lib/security";
 
 interface ApiConfigurationPanelProps {
   isOpen?: boolean;
@@ -30,15 +30,19 @@ const ApiConfigurationPanel = ({
   const [isExpanded, setIsExpanded] = React.useState(isOpen);
   const [apiKey, setApiKey] = React.useState(() => {
     const storedKey = secureStorage.getItem("apiKey");
-    return storedKey ? decrypt(storedKey, import.meta.env.VITE_ENCRYPTION_KEY) : "";
+    return storedKey || "";
   });
   const [documentationUrl, setDocumentationUrl] = React.useState("");
   const [testEndpoint, setTestEndpoint] = React.useState("");
 
-  const handleSave = () => {
-    const encryptedKey = encrypt(apiKey, import.meta.env.VITE_ENCRYPTION_KEY);
-    secureStorage.setItem("apiKey", encryptedKey);
-    onSave({ apiKey, documentationUrl, testEndpoint });
+  const handleSave = async () => {
+    try {
+      const encryptedKey = await encrypt(apiKey, import.meta.env.VITE_ENCRYPTION_KEY);
+      await secureStorage.setItem("apiKey", encryptedKey);
+      onSave({ apiKey, documentationUrl, testEndpoint });
+    } catch (error) {
+      console.error('Failed to save API key:', error);
+    }
   };
 
   return (
