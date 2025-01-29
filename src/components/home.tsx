@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputModeSelector from "./game-creation/InputModeSelector";
 import DescriptionInput from "./game-creation/DescriptionInput";
 import SurveyForm from "./game-creation/SurveyForm";
@@ -12,14 +12,47 @@ const Home = () => {
   const [gameDescription, setGameDescription] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showApiConfig, setShowApiConfig] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [generatedGame, setGeneratedGame] = useState(null);
 
   const handleGenerate = async () => {
-    setIsGenerating(true);
-    setShowApiConfig(true);
-    // Simulating API call delay
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsGenerating(false);
+    const controller = new AbortController();
+    
+    try {
+      setIsGenerating(true);
+      setError(null);
+
+      const response = await fetch(API_ENDPOINT, {
+        signal: controller.signal,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({ description: gameDescription })
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
+      const data = await response.json();
+      setGeneratedGame(data);
+
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setError(err.message || 'Failed to generate game');
+      }
+    } finally {
+      setIsGenerating(false);
+    }
   };
+
+  // Add cleanup effect
+  useEffect(() => {
+    return () => {
+      const controller = new AbortController();
+      controller.abort();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">

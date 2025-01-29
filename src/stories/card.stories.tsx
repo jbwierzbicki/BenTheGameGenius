@@ -43,8 +43,16 @@ export const Base = {
           <form>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" placeholder="Name of your project" />
+                <Label htmlFor="name" id="name-label">Project Name</Label>
+                <Input
+                  id="name"
+                  aria-labelledby="name-label"
+                  aria-describedby="name-description"
+                  placeholder="Enter project name"
+                />
+                <p id="name-description" className="sr-only">
+                  Required field. Maximum 50 characters.
+                </p>
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="framework">Framework</Label>

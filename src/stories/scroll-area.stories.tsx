@@ -1,5 +1,6 @@
 // [build] library: 'shadcn'
 import React from "react";
+import { FixedSizeList } from 'react-window';
 
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Separator } from "../components/ui/separator";
@@ -12,23 +13,22 @@ const meta = {
 };
 export default meta;
 
-export const Base = {
-  render: () => (
-    <ScrollArea className="h-72 w-48 rounded-md border border-slate-100 dark:border-slate-700">
-      <div className="p-4">
-        <h4 className="mb-4 text-sm font-medium leading-none">Tags</h4>
-        {Array.from({ length: 50 })
-          .map((_, i, a) => `v1.2.0-beta.${a.length - i}`)
-          .map((tag) => (
-            <React.Fragment>
-              <div className="text-sm" key={tag}>
-                {tag}
-              </div>
-              <Separator className="my-2" />
-            </React.Fragment>
-          ))}
-      </div>
-    </ScrollArea>
-  ),
-  args: {},
-};
+const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => (
+  <div style={style} className="text-sm">
+    Tag {index + 1}
+    <Separator className="my-2" />
+  </div>
+);
+
+export const ScrollAreaStory = () => (
+  <ScrollArea className="h-[200px] w-[350px] rounded-md border p-4">
+    <FixedSizeList
+      height={200}
+      width={350}
+      itemSize={35}
+      itemCount={50}
+    >
+      {Row}
+    </FixedSizeList>
+  </ScrollArea>
+);

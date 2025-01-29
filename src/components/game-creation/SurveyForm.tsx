@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -18,18 +18,48 @@ interface SurveyFormProps {
   isLoading?: boolean;
 }
 
+interface FormState {
+  playerCount: string;
+  duration: string;
+  gameType: string;
+  complexity: string;
+  requirements: string;
+}
+
 const SurveyForm = ({
   onSubmit = () => {},
   isLoading = false,
 }: SurveyFormProps) => {
+  const [formData, setFormData] = useState<FormState>({
+    playerCount: "2-4",
+    duration: "medium",
+    gameType: "strategy",
+    complexity: "medium",
+    requirements: ""
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.playerCount) newErrors.playerCount = "Required";
+    if (!formData.complexity) newErrors.complexity = "Required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onSubmit(formData);
+    }
+  };
+
   return (
     <Card className="w-full max-w-[800px] p-6 bg-white">
       <form
         className="space-y-8"
-        onSubmit={(e) => {
-          e.preventDefault();
-          onSubmit({});
-        }}
+        onSubmit={handleSubmit}
       >
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-gray-900">
@@ -41,7 +71,10 @@ const SurveyForm = ({
             <Label htmlFor="playerCount">
               How many players is the game designed for?
             </Label>
-            <Select defaultValue="2-4">
+            <Select
+              value={formData.playerCount}
+              onValueChange={(v) => setFormData(p => ({...p, playerCount: v}))}
+            >
               <SelectTrigger id="playerCount">
                 <SelectValue placeholder="Select player count" />
               </SelectTrigger>
@@ -52,12 +85,16 @@ const SurveyForm = ({
                 <SelectItem value="8+">8+ Players</SelectItem>
               </SelectContent>
             </Select>
+            {errors.playerCount && <p className="text-red-500 text-sm">{errors.playerCount}</p>}
           </div>
 
           {/* Game Duration */}
           <div className="space-y-2">
             <Label htmlFor="duration">Estimated game duration</Label>
-            <Select defaultValue="medium">
+            <Select
+              value={formData.duration}
+              onValueChange={(v) => setFormData(p => ({...p, duration: v}))}
+            >
               <SelectTrigger id="duration">
                 <SelectValue placeholder="Select game duration" />
               </SelectTrigger>
@@ -98,7 +135,10 @@ const SurveyForm = ({
           {/* Complexity Level */}
           <div className="space-y-2">
             <Label htmlFor="complexity">Game Complexity</Label>
-            <Select defaultValue="medium">
+            <Select
+              value={formData.complexity}
+              onValueChange={(v) => setFormData(p => ({...p, complexity: v}))}
+            >
               <SelectTrigger id="complexity">
                 <SelectValue placeholder="Select complexity level" />
               </SelectTrigger>
@@ -123,7 +163,8 @@ const SurveyForm = ({
               id="requirements"
               placeholder="Enter any special components or materials needed for the game..."
               className="min-h-[100px]"
-              defaultValue="Standard playing cards, dice, or common household items"
+              value={formData.requirements}
+              onChange={(e) => setFormData(p => ({...p, requirements: e.target.value}))}
             />
           </div>
 
@@ -133,7 +174,8 @@ const SurveyForm = ({
             <Input
               id="theme"
               placeholder="e.g., Fantasy, Sci-fi, Historical, etc."
-              defaultValue="Fantasy"
+              value={formData.theme}
+              onChange={(e) => setFormData(p => ({...p, theme: e.target.value}))}
             />
           </div>
         </div>

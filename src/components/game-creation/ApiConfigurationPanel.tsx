@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp, Key, Link, TestTube2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { secureStorage } from "@/lib/security";
 
 interface ApiConfigurationPanelProps {
   isOpen?: boolean;
@@ -27,9 +28,18 @@ const ApiConfigurationPanel = ({
   onTest = () => {},
 }: ApiConfigurationPanelProps) => {
   const [isExpanded, setIsExpanded] = React.useState(isOpen);
-  const [apiKey, setApiKey] = React.useState("");
+  const [apiKey, setApiKey] = React.useState(() => {
+    const storedKey = secureStorage.getItem("apiKey");
+    return storedKey ? decrypt(storedKey, process.env.ENCRYPTION_KEY) : "";
+  });
   const [documentationUrl, setDocumentationUrl] = React.useState("");
   const [testEndpoint, setTestEndpoint] = React.useState("");
+
+  const handleSave = () => {
+    const encryptedKey = encrypt(apiKey, process.env.ENCRYPTION_KEY);
+    secureStorage.setItem("apiKey", encryptedKey);
+    onSave({ apiKey, documentationUrl, testEndpoint });
+  };
 
   return (
     <Card className="w-full max-w-[600px] p-6 bg-white shadow-sm">
@@ -110,9 +120,7 @@ const ApiConfigurationPanel = ({
                 Test
               </Button>
               <Button
-                onClick={() =>
-                  onSave({ apiKey, documentationUrl, testEndpoint })
-                }
+                onClick={handleSave}
                 className="w-24"
               >
                 Save
